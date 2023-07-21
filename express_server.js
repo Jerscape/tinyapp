@@ -18,6 +18,7 @@ function generateRandomString() {
     tiny = tiny + alphaNum[num]
   }
 
+  //assesses if tiny url already exists, and if so, re-calls the function
   if(urlDatabase.hasOwnProperty(tiny)){
     generateRandomString()
   } else {
@@ -85,6 +86,16 @@ app.get("/hello", (req, res)=> {
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
+});
+
+app.get("/u/:id", (req, res) => {
+  // const longURL = ...
+  console.log("req params.id", req.params.id)
+  console.log(urlDatabase)
+  const longURL = urlDatabase[req.params.id]
+  //urlDatabase[id] = req.body.longURL
+  console.log("longurl" , longURL)
+  res.redirect(longURL);
 });
 
 app.get("/urls/:id", (req, res) => {
