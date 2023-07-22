@@ -77,19 +77,27 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls", (req, res) => {
   //console.log(req.body); // Log the POST request body to the 
   //console.log(req.body.longURL)
-  const id = generateRandomString()
-  urlDatabase[id] = req.body.longURL
-  console.log(urlDatabase)
-  res.redirect(`/urls/${id}`)
+  const id = generateRandomString();
+  urlDatabase[id] = req.body.longURL;
+  console.log(urlDatabase);
+  res.redirect(`/urls/${id}`);
 
 });
 
 app.post("/urls/:id/delete", (req, res)=>{
-  const id = req.params.id
-  console.log("id", id)
-  delete urlDatabase[id]
-  console.log(urlDatabase)
-  res.redirect(`/urls/`)
+  const id = req.params.id;
+  console.log("id", id);
+  delete urlDatabase[id];
+  console.log(urlDatabase);
+  res.redirect(`/urls/`);
+})
+
+app.post("/urls/:id/edit", (req, res)=>{
+  const id = req.params.id;
+  const newUrl = req.body.longURL;
+  urlDatabase[id] = newUrl;
+  res.redirect('/urls')
+
 })
 
 app.listen(PORT, () => {
