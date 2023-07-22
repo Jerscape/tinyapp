@@ -14,7 +14,7 @@ function generateRandomString() {
   let tiny = "";
   const alphaNum = 'abcdefghijklmnopqrstuvwxyz0123456789'
   for(let x =0; x < 6; x++){
-    let num = Math.round(Math.random()*36)
+    let num = Math.round(Math.random()*35)
     tiny = tiny + alphaNum[num]
   }
 
@@ -24,41 +24,10 @@ function generateRandomString() {
   } else {
     return tiny
   }
-  // for(let x = 0; x <6; x++){
-  // let num = Math.round((Math.random() * 5))
-  //   console.log(num)
-  //   if(num % 2 === 0){
-  //     if(num === 0){
-  //       let insert = "a";
-  //       tiny = tiny + insert;
-  //     } else if(num === 1){
-  //       let insert = "b";
-  //       tiny = tiny + insert;
-  //     } else {
-  //       let insert = "c";
-  //       tiny = tiny + insert;
-  //     } 
-  //   } else {
-  //     num.toString();
-  //     tiny = tiny + num;
-  //   }
 
-  //   }
-  //console.log(tiny)
-
-  //assesses for duplicates before returning
-  //if found, it calls the function again
-  // if(urlDatabase.hasOwnProperty(tiny)){
-  //   generateRandomString()
-  // } else {
-  //   return tiny
-  // }
   
 }
-
-//testing (it works)
-let randomString = generateRandomString()
-console.log("After call" , randomString)
+ 
 
 
 //converts request body to a string 
