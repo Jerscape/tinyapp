@@ -84,6 +84,14 @@ app.post("/urls", (req, res) => {
 
 });
 
+app.post("/login", (req, res)=>{
+  console.log("login route req param username: ", req.params.username )
+  res.cookie('username', req.body.username)
+  //const userName = req.params.username
+  res.redirect(`/urls/`);
+ 
+})
+
 app.post("/urls/:id/delete", (req, res)=>{
   const id = req.params.id;
   console.log("id", id);
