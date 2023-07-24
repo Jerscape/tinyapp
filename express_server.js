@@ -100,6 +100,12 @@ app.post("/login", (req, res)=>{
  //
 })
 
+app.post("/logout", (req, res)=>{
+  
+  res.clearCookie('username')
+  res.redirect(`/urls/`);
+})
+
 app.post("/urls/:id/delete", (req, res)=>{
   const id = req.params.id;
   console.log("id", id);
