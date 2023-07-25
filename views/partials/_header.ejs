@@ -19,11 +19,12 @@
       </div>
    
       <div>
-        <% if(username) { %> 
+        
+        <% if(user) { %> 
           
           <form action="/logout" method="POST" >
             <div>
-              <p>"Logged in as tinyapp user: " <%= username %></p>
+              <p>"Logged in as tinyapp user: " <%= user.email %></p>
               <button type="submit" value="Submit">Logout</button>
             </div>
           </form> 

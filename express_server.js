@@ -6,11 +6,17 @@ const PORT = 8080;
 
 app.set("view engine", "ejs")
 
+//should these objects and possibly the other constants be moved to a dedicated file?
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
   };
 
+
+const users ={
+
+}
 
 function generateRandomString() {
   let tiny = "";
@@ -38,9 +44,10 @@ app.use(express.urlencoded({ extended: true }));
 
 //get routes
 app.get("/urls", (req, res) => {
+  const userObject = users[req.cookies.userID]
   const templateVars = {
     urls: urlDatabase, 
-    username: req.cookies["username"]
+    user: userObject
   
   } 
   res.render("urls_index", templateVars)
@@ -59,9 +66,21 @@ app.get("/hello", (req, res)=> {
   res.send("<html><body>Hello <b>World</b></body><html>\n")
 })
 
-app.get("/urls/new", (req, res) => {
+app.get("/register", (req, res)=>{
+
+  const userObject = users[req.cookies.userID]
   const templateVars = {
-    username: req.cookies["username"]
+    user: userObject
+  
+  } 
+  res.render("urls_register", templateVars)
+})
+
+app.get("/urls/new", (req, res) => {
+  //note the notation type. As its not dynamic we use dot notation
+  const userObject = users[req.cookies.userID]
+  const templateVars = {
+    user: userObject
   
   } 
   res.render("urls_new", templateVars);
@@ -79,7 +98,10 @@ app.get("/u/:id", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id
-  const templateVars = { id: req.params.id, longURL: urlDatabase[id], username: req.cookies["username"] };
+  //ammended to pass the entire user object instead of the cookie....?
+  //const userObject = users[userID]
+  const userObject = users[req.cookies.userID]
+  const templateVars = { id: req.params.id, longURL: urlDatabase[id], user: userObject };
   res.render("urls_show", templateVars);
 });
 
@@ -120,6 +142,16 @@ app.post("/urls/:id/edit", (req, res)=>{
   urlDatabase[id] = newUrl;
   res.redirect('/urls')
 
+})
+
+app.post("/register", (req, res) => {
+  const userID = generateRandomString()
+  //console.log(req.body)
+  users[userID] = {id: userID, email: req.body.email, password: req.body.password}
+  //console.log(users)
+  //console.log()
+  res.cookie('userID', userID)
+  res.redirect('/urls')
 })
 
 app.listen(PORT, () => {
