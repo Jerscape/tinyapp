@@ -1,7 +1,10 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express();
 const cookieParser = require('cookie-parser')
+
 app.use(cookieParser())
+app.use(morgan("dev"))
 const PORT = 8080;
 
 app.set("view engine", "ejs")
@@ -18,6 +21,9 @@ const users ={
 
 }
 
+
+//helper functions 
+
 function generateRandomString() {
   let tiny = "";
   const alphaNum = 'abcdefghijklmnopqrstuvwxyz0123456789'
@@ -33,10 +39,23 @@ function generateRandomString() {
     return tiny
   }
 
-  
-}
+  }
  
+//userlookup function
+const getUserByEmail = function(email){
 
+  // console.log("email passed: ", email)
+  // console.log("users from within function: ", users)
+  for(const userId in users){
+   
+    if(users[userId].email === email){
+      return userId
+    }
+
+  }
+
+  return undefined
+}
 
 //converts request body to a string 
 //it then adds the data to the request object under the key "body"
@@ -65,6 +84,11 @@ app.get("/urls.json", (req, res) => {
 app.get("/hello", (req, res)=> {
   res.send("<html><body>Hello <b>World</b></body><html>\n")
 })
+
+app.get('/login', (req, res) =>{
+  res.render("login")
+})
+
 
 app.get("/register", (req, res)=>{
 
@@ -146,12 +170,26 @@ app.post("/urls/:id/edit", (req, res)=>{
 
 app.post("/register", (req, res) => {
   const userID = generateRandomString()
-  //console.log(req.body)
-  users[userID] = {id: userID, email: req.body.email, password: req.body.password}
-  //console.log(users)
-  //console.log()
-  res.cookie('userID', userID)
-  res.redirect('/urls')
+  
+  const password = req.body.password
+  const email = req.body.email
+  //assess for blank email or blank password
+  //then check the user look up result
+  if(password.length === 0 || email.length === 0){
+    res.sendStatus(400)
+    console.log("error triggered")
+    return 
+  }
+
+  if(getUserByEmail(email, users)){
+    return res.status(400).send("<h1>Email in use</h1>")
+  }
+    users[userID] = {id: userID, email, password}
+    res.cookie('userID', userID)
+    console.log(users)
+    res.redirect('/urls')
+  
+
 })
 
 app.listen(PORT, () => {
