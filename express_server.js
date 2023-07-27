@@ -84,7 +84,12 @@ app.get("/hello", (req, res)=> {
 });
 
 app.get('/login', (req, res) =>{
-//
+
+  //attempting to say if cookie is present, do the epxressions in if
+  if(req.cookies.userID){
+    return res.redirect("/urls")
+   
+  }
   const templateVars = {user: undefined};
   res.render("login", templateVars);
 });
@@ -92,16 +97,26 @@ app.get('/login', (req, res) =>{
 
 app.get("/register", (req, res)=>{
 
+  if(req.cookies.userID){
+    return res.redirect("/urls")
+   
+  }
   const userObject = users[req.cookies.userID];
   const templateVars = {
     user: userObject
   
   };
+
   res.render("urls_register", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   //note the notation type. As its not dynamic we use dot notation
+
+  if(!req.cookies.userID){
+    return res.redirect("/login")
+   
+  }
   const userObject = users[req.cookies.userID];
   const templateVars = {
     user: userObject
@@ -117,6 +132,12 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+
+  //check if in database, if not send error message 
+  if(!urlDatabase.hasOwnProperty(req.params.id)){
+    res.send("<h1>I'm sorry, that is not a valid short url</h1>")
+  }
+
   const id = req.params.id;
   const userObject = users[req.cookies.userID];
   const templateVars = { id: req.params.id, longURL: urlDatabase[id], user: userObject };
@@ -126,6 +147,11 @@ app.get("/urls/:id", (req, res) => {
 //POST ROUTES
 app.post("/urls", (req, res) => {
 
+  if(!req.cookies.userID){
+    return res.send("<h1>You are not logged in</h1>")
+    //return res.redirect("/login")
+   
+  }
   const id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
   res.redirect(`/urls/${id}`);
