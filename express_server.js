@@ -44,8 +44,6 @@ function generateRandomString() {
 //userlookup function
 const getUserByEmail = function(email){
 
-  // console.log("email passed: ", email)
-  // console.log("users from within function: ", users)
   for(const userId in users){
    
     if(users[userId].email === email){
@@ -124,17 +122,14 @@ app.get("/u/:id", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id
-  //ammended to pass the entire user object instead of the cookie....?
-  //const userObject = users[userID]
   const userObject = users[req.cookies.userID]
   const templateVars = { id: req.params.id, longURL: urlDatabase[id], user: userObject };
   res.render("urls_show", templateVars);
 });
 
-//post routes
+//POST ROUTES
 app.post("/urls", (req, res) => {
-  //console.log(req.body); // Log the POST request body to the 
-  //console.log(req.body.longURL)
+
   const id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
   console.log(urlDatabase);
@@ -148,16 +143,17 @@ app.post("/login", (req, res)=>{
 
   for(const user in users){
  
+    //refactor to use lookupemail function instead...i guess...
     if(users[user].email === email){
       if(users[user].password === password){
         res.cookie("userID", user)
         res.redirect(`/urls/`);
       } else {
-        res.status(403).send("Incorrect password")
+        res.status(403).send("Invalid credentials")
       }
 
     } else {
-      res.status(404).send("Email does not exist")
+      res.status(403).send("Invalid credentials")
     }
 
   }
@@ -194,8 +190,7 @@ app.post("/register", (req, res) => {
   //assess for blank email or blank password
   //then check the user look up result
   if(password.length === 0 || email.length === 0){
-    res.sendStatus(400)
-    console.log("error triggered")
+    res.sendStatus(400).send("<h1>Please provide both an email and a password</h1>")
     return 
   }
 
