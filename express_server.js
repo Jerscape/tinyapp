@@ -86,7 +86,9 @@ app.get("/hello", (req, res)=> {
 })
 
 app.get('/login', (req, res) =>{
-  res.render("login")
+//
+  const templateVars = {user: undefined}
+  res.render("login", templateVars)
 })
 
 
@@ -141,15 +143,31 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/login", (req, res)=>{
-  res.cookie('username', req.body.username)
-  res.redirect(`/urls/`);
- //
+  const email = req.body.email
+  const password = req.body.password
+
+  for(const user in users){
+ 
+    if(users[user].email === email){
+      if(users[user].password === password){
+        res.cookie("userID", user)
+        res.redirect(`/urls/`);
+      } else {
+        res.status(403).send("Incorrect password")
+      }
+
+    } else {
+      res.status(404).send("Email does not exist")
+    }
+
+  }
+ 
 })
 
 app.post("/logout", (req, res)=>{
   
-  res.clearCookie('username')
-  res.redirect(`/urls/`);
+  res.clearCookie('userID')
+  res.redirect(`/login/`);
 })
 
 app.post("/urls/:id/delete", (req, res)=>{
@@ -189,7 +207,6 @@ app.post("/register", (req, res) => {
     console.log(users)
     res.redirect('/urls')
   
-
 })
 
 app.listen(PORT, () => {
