@@ -11,19 +11,24 @@ app.set("view engine", "ejs");
 
 //should these objects and possibly the other constants be moved to a dedicated file?
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "y7kl89"
+  },
+
+  "9sm5xK": {
+    longURL: "http://www.google.com",
+    userID: "klj789"
+  }
 };
 
 
-const users = {
-
-};
+const users = {};
 
 
 //helper functions
 
-const generateRandomString = function() {
+const generateRandomString = function () {
   let tiny = "";
   const alphaNum = 'abcdefghijklmnopqrstuvwxyz0123456789';
   for (let x = 0; x < 6; x++) {
@@ -39,12 +44,13 @@ const generateRandomString = function() {
   }
 
 };
- 
+
+
 //userlookup function
-const getUserByEmail = function(email) {
+const getUserByEmail = function (email) {
 
   for (const userId in users) {
-   
+
     if (users[userId].email === email) {
       return userId;
     }
@@ -54,24 +60,48 @@ const getUserByEmail = function(email) {
   return undefined;
 };
 
+//urlsbyuser function
+
+
 //converts request body to a string
 //it then adds the data to the request object under the key "body"
 app.use(express.urlencoded({ extended: true }));
 
 //GET ROUTES
+
+ 
+const urlsForUser = function(userID, database) {
+
+  //filter the entire urlDatabase looking for only urls that match the userID
+  let userURLs = {}
+  for(const shortID in database){
+    if(database[shortID].userID === userID){
+      userURLs[shortID] = database[shortID]
+    }
+  }
+
+  console.log("urlsforuser", userURLs )
+  return userURLs
+}
+
 app.get("/urls", (req, res) => {
   const userObject = users[req.cookies.userID];
+
+  const userUrls = urlsForUser(req.cookies.userID, urlDatabase)
+  //filter the entire urlDatabase looking for only urls that match the userID
+
+
   const templateVars = {
-    urls: urlDatabase,
+    urls: userUrls,
     user: userObject
-  
+
   };
 
   res.render("urls_index", templateVars);
 
 });
 
-app.get("/", (req, res) =>{
+app.get("/", (req, res) => {
   res.send("Hello");
 });
 
@@ -79,32 +109,32 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/hello", (req, res)=> {
+app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body><html>\n");
 });
 
-app.get('/login', (req, res) =>{
+app.get('/login', (req, res) => {
 
   //attempting to say if cookie is present, do the epxressions in if
-  if(req.cookies.userID){
+  if (req.cookies.userID) {
     return res.redirect("/urls")
-   
+
   }
-  const templateVars = {user: undefined};
+  const templateVars = { user: undefined };
   res.render("login", templateVars);
 });
 
 
-app.get("/register", (req, res)=>{
+app.get("/register", (req, res) => {
 
-  if(req.cookies.userID){
+  if (req.cookies.userID) {
     return res.redirect("/urls")
-   
+
   }
   const userObject = users[req.cookies.userID];
   const templateVars = {
     user: userObject
-  
+
   };
 
   res.render("urls_register", templateVars);
@@ -113,57 +143,71 @@ app.get("/register", (req, res)=>{
 app.get("/urls/new", (req, res) => {
   //note the notation type. As its not dynamic we use dot notation
 
-  if(!req.cookies.userID){
+  if (!req.cookies.userID) {
     return res.redirect("/login")
-   
+
   }
   const userObject = users[req.cookies.userID];
   const templateVars = {
     user: userObject
-  
+
   };
   res.render("urls_new", templateVars);
 });
 
 app.get("/u/:id", (req, res) => {
 
-  const longURL = urlDatabase[req.params.id];
+  //HERE
+  const longURL = urlDatabase[req.params.id].longURL
   res.redirect(longURL);
 });
+
+// app.get("/u/:id", (req, res) => {
+
+//   const longURL = urlDatabase[req.params.id];
+//   res.redirect(longURL);
+// });
 
 app.get("/urls/:id", (req, res) => {
 
   //check if in database, if not send error message 
-  if(!urlDatabase.hasOwnProperty(req.params.id)){
+  if (!urlDatabase.hasOwnProperty(req.params.id)) {
     res.send("<h1>I'm sorry, that is not a valid short url</h1>")
   }
 
-  const id = req.params.id;
-  const userObject = users[req.cookies.userID];
-  const templateVars = { id: req.params.id, longURL: urlDatabase[id], user: userObject };
+  const shortID = req.params.id;
+  const user = users[req.cookies.userID];
+  //HERE
+  const longURL = urlDatabase[shortID].longURL
+  const templateVars = { id: shortID, longURL, user };
   res.render("urls_show", templateVars);
 });
 
 //POST ROUTES
+//this is called primarity by the new template
 app.post("/urls", (req, res) => {
 
-  if(!req.cookies.userID){
+  if (!req.cookies.userID) {
     return res.send("<h1>You are not logged in</h1>")
     //return res.redirect("/login")
-   
+
   }
-  const id = generateRandomString();
-  urlDatabase[id] = req.body.longURL;
-  res.redirect(`/urls/${id}`);
+  const shortID = generateRandomString();
+  const longURL = req.body.longURL
+  const userID = req.cookies.userID
+  //HERE
+  urlDatabase[shortID] = {longURL, userID}
+  res.redirect(`/urls/${shortID}`);
 
 });
 
-app.post("/login", (req, res)=>{
+
+app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
   for (const user in users) {
- 
+
     if (users[user].email === email) {
       if (users[user].password === password) {
         res.cookie("userID", user);
@@ -177,36 +221,38 @@ app.post("/login", (req, res)=>{
     }
 
   }
- 
+
 });
 
-app.post("/logout", (req, res)=>{
-  
+app.post("/logout", (req, res) => {
+
   res.clearCookie('userID');
   res.redirect(`/login/`);
 });
 
-app.post("/urls/:id/delete", (req, res)=>{
-  const id = req.params.id;
-  delete urlDatabase[id];
+app.post("/urls/:id/delete", (req, res) => {
+  const shortID = req.params.id;
+  //HERE...WOULD THIS JUST BE THE SAME AS I AM DELETING THE WHOLE OBJECT???
+  delete urlDatabase[shortID];
   res.redirect(`/urls/`);
 });
 
-app.post("/urls/:id/edit", (req, res)=>{
-  const id = req.params.id;
+app.post("/urls/:id/edit", (req, res) => {
+  const shortID = req.params.id;
   const newUrl = req.body.longURL;
-  urlDatabase[id] = newUrl;
+  //HERE
+  urlDatabase[shortID].longURL = newUrl;
   res.redirect('/urls');
 
 });
 
 app.post("/register", (req, res) => {
-  const userID = generateRandomString();
+ 
   const password = req.body.password;
   const email = req.body.email;
   //assess for blank email or blank password
   //then check the user look up result
-  if (password.length === 0 || email.length === 0) {
+  if (!password || !email) {
     res.sendStatus(400).send("<h1>Please provide both an email and a password</h1>");
     return;
   }
@@ -214,10 +260,13 @@ app.post("/register", (req, res) => {
   if (getUserByEmail(email, users)) {
     return res.status(400).send("<h1>Email in use</h1>");
   }
-  users[userID] = {id: userID, email, password};
+
+  const userID = generateRandomString();
+  users[userID] = { id: userID, email, password };
+  
   res.cookie('userID', userID);
   res.redirect('/urls');
-  
+
 });
 
 app.listen(PORT, () => {
