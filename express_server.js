@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const app = express();
 const cookieParser = require('cookie-parser');
+const bcrypt = require("bcryptjs")
 
 app.use(cookieParser());
 app.use(morgan("dev"));
@@ -80,7 +81,7 @@ const urlsForUser = function(userID, database) {
     }
   }
 
-  console.log("urlsforuser", userURLs )
+  //console.log("urlsforuser", userURLs )
   return userURLs
 }
 
@@ -203,21 +204,30 @@ app.post("/urls", (req, res) => {
 
 
 app.post("/login", (req, res) => {
+  
   const email = req.body.email;
   const password = req.body.password;
-
+  console.log("users object", users)
+  let found = false;
   for (const user in users) {
 
     if (users[user].email === email) {
-      if (users[user].password === password) {
+      found = true;
+      //bcrypt.compareSync returns boolean
+      //console.log(password, users[user].email, users[user].hashedPassword)
+      if (bcrypt.compareSync(password, users[user].hashedPassword)) {
         res.cookie("userID", user);
         res.redirect(`/urls/`);
       } else {
+        console.log("2nd/inner else")
         res.status(403).send("Invalid credentials");
+      
       }
 
-    } else {
+    } if(!found) {
+      console.log("1st else")
       res.status(403).send("Invalid credentials");
+      
     }
 
   }
@@ -277,6 +287,7 @@ app.post("/urls/:id/edit", (req, res) => {
 app.post("/register", (req, res) => {
  
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const email = req.body.email;
   //assess for blank email or blank password
   //then check the user look up result
@@ -290,7 +301,7 @@ app.post("/register", (req, res) => {
   }
 
   const userID = generateRandomString();
-  users[userID] = { id: userID, email, password };
+  users[userID] = { id: userID, email, hashedPassword };
   
   res.cookie('userID', userID);
   res.redirect('/urls');
