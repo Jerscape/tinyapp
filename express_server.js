@@ -231,16 +231,44 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  const shortID = req.params.id;
+
+  const shortID = req.params.id
+  const userID = req.cookies.userID
+  //check if user logged in
+  if(!userID) {
+    res.send("<h1>Please log in first</h1>");
+    return ;
+  }
+
+  //check if logged in user owns the url
+  if(urlDatabase[shortID].userID !== userID){
+    res.send("<h1>You are not the owner of this url, therefore you cannot delete it</h1>")
+    return;
+  }
+
   //HERE...WOULD THIS JUST BE THE SAME AS I AM DELETING THE WHOLE OBJECT???
   delete urlDatabase[shortID];
   res.redirect(`/urls/`);
 });
 
 app.post("/urls/:id/edit", (req, res) => {
-  const shortID = req.params.id;
+
+  const shortID = req.params.id
+  const userID = req.cookies.userID
+  //check if user logged in
+  if(!userID) {
+    res.send("<h1>Please log in first</h1>");
+    return ;
+  }
+
+  //check if logged in user owns the url
+  if(urlDatabase[shortID].userID !== userID){
+    res.send("<h1>You are not the owner of this url. Access to edit denied.</h1>")
+    return
+  }
+
+
   const newUrl = req.body.longURL;
-  //HERE
   urlDatabase[shortID].longURL = newUrl;
   res.redirect('/urls');
 
