@@ -10,7 +10,7 @@ This project was created and published by me (Jeremy Dutton) as part of my learn
 
 ## Documentation 
 
-This app possesses the following functionality 
+This app possesses the following functionality:
 
 * It allows users to register
 * It accepts long urls and shortens them to 6 random characters
@@ -18,7 +18,16 @@ This app possesses the following functionality
 * it allows the user to edit/delete their long url/tiny combinations
 * it usings hashing and bcrypt for enhanced security
 
-TO RUN
+## Dependencies
 
-* start express_server file
-* go to port 8080 endpoint /register
+* Node.js
+* Express
+* EJS
+* bcryptjs
+* cookie-session
+
+## Getting started
+
+* Install all dependencies using the npm install command
+* Run the express_server.js file
+* Go to port 8080 endpoint /register
