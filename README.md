@@ -1,4 +1,4 @@
-# tinyapp 
+# Tinyapp 
 
 A mini clone of tiny url
 
@@ -17,6 +17,12 @@ This app possesses the following functionality:
 * It saves both the long url and its shortened a.ka. "tiny' version and associates them to the specific user
 * it allows the user to edit/delete their long url/tiny combinations
 * it usings hashing and bcrypt for enhanced security
+
+## Screenshots
+
+!["Screenshot of URLs page"](https://github.com/Jerscape/tinyapp/blob/master/docs/Index.PNG?raw=true)
+!["Create tiny url"](https://github.com/Jerscape/tinyapp/blob/master/docs/Create%20new%20url.PNG?raw=true)
+!["Registration"](https://github.com/Jerscape/tinyapp/blob/master/docs/register.PNG?raw=true)
 
 ## Dependencies
 
