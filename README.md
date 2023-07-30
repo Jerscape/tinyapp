@@ -2,7 +2,7 @@
 
 A mini clone of tiny url
 
-## purpose
+## Purpose
 
 **_BEWARE:_ This library was published for learning purposes. It is _not_ intended for use in production-grade software.**
 
