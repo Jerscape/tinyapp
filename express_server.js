@@ -217,7 +217,7 @@ app.post("/logout", (req, res) => {
 
 app.post("/urls/:id/delete", (req, res) => {
 
-  const shortID = req.params.;
+  const shortID = req.params.id
   const userID = req.session.userID;
 
   //check if user logged in
