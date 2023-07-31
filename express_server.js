@@ -1,7 +1,7 @@
 //constants
 const express = require('express');
 const morgan = require('morgan');
-const getUserByEmail = require('./helpers');
+const {getUserByEmail, generateRandomString} = require('./helpers');
 const app = express();
 const bcrypt = require("bcryptjs");
 
@@ -33,22 +33,22 @@ app.set("view engine", "ejs");
 
 
 //random string function
-const generateRandomString = function() {
-  let tiny = "";
-  const alphaNum = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  for (let x = 0; x < 6; x++) {
-    let num = Math.round(Math.random() * 35);
-    tiny = tiny + alphaNum[num];
-  }
+// const generateRandomString = function() {
+//   let tiny = "";
+//   const alphaNum = 'abcdefghijklmnopqrstuvwxyz0123456789';
+//   for (let x = 0; x < 6; x++) {
+//     let num = Math.round(Math.random() * 35);
+//     tiny = tiny + alphaNum[num];
+//   }
 
-  //assesses if tiny url already exists, and if so, re-calls the function
-  if (urlDatabase.hasOwnProperty(tiny)) {
-    generateRandomString();
-  } else {
-    return tiny;
-  }
+//   //assesses if tiny url already exists, and if so, re-calls the function
+//   if (urlDatabase.hasOwnProperty(tiny)) {
+//     generateRandomString();
+//   } else {
+//     return tiny;
+//   }
 
-};
+// };
 
 
 //converts request body to a string
@@ -83,6 +83,7 @@ app.get("/urls", (req, res) => {
 
   if(req.session.userID){
     res.render("urls_index", templateVars);
+
   } else {
     res.send("<h1>You must be logged in to view URLS</h1>")
   }
@@ -219,7 +220,7 @@ app.post("/login", (req, res) => {
   }
 
   const user = getUserByEmail(email, users);
-  console.log("user", user);
+  //console.log("user", user);
 
   if (!user) {
     return res.status(403).send("Invalid credentials");
@@ -317,3 +318,5 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+//this is throwing an error
+module.exports = {urlDatabase}
