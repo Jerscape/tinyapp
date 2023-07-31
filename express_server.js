@@ -22,6 +22,7 @@ const users = {};
 
 //app.use
 const cookieSession = require('cookie-session');
+const { restart } = require('nodemon');
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key']
@@ -80,13 +81,23 @@ app.get("/urls", (req, res) => {
 
   };
 
-  res.render("urls_index", templateVars);
+  if(req.session.userID){
+    res.render("urls_index", templateVars);
+  } else {
+    res.send("<h1>You must be logged in to view URLS</h1>")
+  }
+ 
 
 });
 
 //unclassified get routes
 app.get("/", (req, res) => {
-  res.send("Hello");
+  if(req.session.userID){
+    res.redirect('/urls')
+  } else {
+    res.redirect("/login")
+  }
+  //res.send("Hello");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -143,8 +154,23 @@ app.get("/urls/new", (req, res) => {
 //id get route
 app.get("/u/:id", (req, res) => {
 
-  const longURL = urlDatabase[req.params.id].longURL;
-  res.redirect(longURL);
+  //assess if they are logged in
+  console.log("user id: ", req.session.userID)
+  if(req.session.userID){
+    //assess if the url belongs to them
+    console.log("Users", users)
+    if(req.session.userID === urlDatabase[req.params.id].userID){
+      const longURL = urlDatabase[req.params.id].longURL;
+      res.redirect(longURL);
+    } else {
+
+      res.send("<h1>I'm sorry that is not your URL</h1>")
+    }
+
+  } else {
+    res.send("<h1>I'm sorry, you must login first</h1>")
+  }
+  
 });
 
 //get urls id rote
