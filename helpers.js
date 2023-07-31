@@ -27,4 +27,19 @@ const generateRandomString = function() {
 
 };
 
-module.exports = {getUserByEmail, generateRandomString} 
+//urlsforUser
+const urlsForUser = function(userID, database) {
+
+  //filter the entire urlDatabase looking for only urls that match the userID
+  let userURLs = {};
+  for (const shortID in database) {
+    if (database[shortID].userID === userID) {
+      userURLs[shortID] = database[shortID];
+    }
+  }
+
+  return userURLs;
+};
+
+
+module.exports = {getUserByEmail, generateRandomString, urlsForUser} 
